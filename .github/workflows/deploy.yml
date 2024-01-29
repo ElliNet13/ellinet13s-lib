@@ -1,4 +1,4 @@
-name: Python Library Deployment
+name: Deploy library
 
 on:
   push:
@@ -6,12 +6,14 @@ on:
       - main
 
 jobs:
+  # Checkout code from the repository
   checkout:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
+  # Set up Python environment
   setup_python:
     runs-on: ubuntu-latest
     needs: checkout
@@ -21,6 +23,7 @@ jobs:
       with:
         python-version: 3.9
 
+  # Install project dependencies
   install_dependencies:
     runs-on: ubuntu-latest
     needs: setup_python
@@ -28,6 +31,7 @@ jobs:
     - name: Install dependencies
       run: pip install wheel twine
 
+  # Read the current version from setup.py
   read_version:
     runs-on: ubuntu-latest
     needs: install_dependencies
@@ -37,6 +41,7 @@ jobs:
     - name: Read current version
       run: echo "::set-output name=version::$(awk -F"'" '/version=/{print $2}' ./setup.py)"
 
+  # Increment the project version
   increment_version:
     runs-on: ubuntu-latest
     needs: read_version
@@ -46,7 +51,9 @@ jobs:
     - name: Increment version
       run: |
         current_version=$(awk -F"'" '/version=/{print $2}' ./setup.py)
+        # Check if the current version follows a semantic versioning pattern
         if [[ "$current_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          # Increment the last version component (patch version)
           new_version=$(python -c "version = list(map(int, '$current_version'.split('.'))); version[-1] += 1; print('.'.join(map(str, version)))")
           echo "::set-output name=new_version::$new_version"
         else
@@ -54,6 +61,7 @@ jobs:
           exit 1
         fi
 
+  # Update the version in setup.py
   update_version:
     runs-on: ubuntu-latest
     needs: increment_version
@@ -61,6 +69,7 @@ jobs:
     - name: Update version in setup.py
       run: sed -i "s/version='${{ needs.read_version.outputs.version }}'/version='${{ needs.increment_version.outputs.new_version }}'/" ./setup.py
 
+  # Build distribution package
   build_package:
     runs-on: ubuntu-latest
     needs: update_version
@@ -70,6 +79,7 @@ jobs:
         python setup.py sdist
         python setup.py bdist_wheel
 
+  # Publish to PyPI
   publish_to_pypi:
     runs-on: ubuntu-latest
     needs: 
