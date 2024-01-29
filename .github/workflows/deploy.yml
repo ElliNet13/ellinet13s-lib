@@ -1,5 +1,3 @@
-# Python Library Deployment Workflow
-
 on:
   push:
     branches:
@@ -11,108 +9,26 @@ jobs:
     outputs:
       id: current_directory
     steps:
-    - name: Check setup.py existence
-      run: |
-        if [ -f "workflowStuff/setup.py" ]; then
-          echo "::set-output name=current_directory::$(pwd)/workflowStuff"
-        else
-          echo "Error: setup.py not found in workflowStuff directory."
-          exit 1
-        fi
+      - name: Check setup.py existence
+        run: |
+          if [ -f "workflowStuff/setup.py" ]; then
+            echo "::set-output name=current_directory::$(pwd)/workflowStuff"
+          else
+            echo "Error: setup.py not found in workflowStuff directory."
+            echo "Current directory contents:"
+            ls -R
+            echo "workflowStuff directory contents:"
+            ls -R workflowStuff
+            exit 1
+          fi
 
   checkout:
     runs-on: ubuntu-latest
     needs: set_current_directory
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-      with:
-        submodules: recursive
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
 
-  setup_python:
-    runs-on: ubuntu-latest
-    needs: checkout
-    steps:
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-
-  install_dependencies:
-    runs-on: ubuntu-latest
-    needs: setup_python
-    steps:
-    - name: Install dependencies
-      run: pip install wheel twine
-
-  read_version:
-    runs-on: ubuntu-latest
-    needs: 
-      - install_dependencies
-      - set_current_directory
-    outputs:
-      id: version
-    steps:
-    - name: Read current version
-      run: |
-        cd ${{ needs.set_current_directory.outputs.current_directory }}
-        version=$(grep -oP "version=\K'[^']+" setup.py)
-        echo "::set-output name=version::$version"
-
-  increment_version:
-    runs-on: ubuntu-latest
-    needs: 
-      - read_version
-      - set_current_directory
-    outputs:
-      id: new_version
-    steps:
-    - name: Increment version
-      run: |
-        cd ${{ needs.set_current_directory.outputs.current_directory }}
-        current_version=$(grep -oP "version=\K'[^']+" setup.py)
-        if [[ "$current_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-          new_version=$(python -c "version = list(map(int, '$current_version'.split('.'))); version[-1] += 1; print('.'.join(map(str, version)))")
-          echo "::set-output name=new_version::$new_version"
-        else
-          echo "Error: Current version ('$current_version') is not in the expected format."
-          exit 1
-        fi
-
-  update_version:
-    runs-on: ubuntu-latest
-    needs: 
-      - increment_version
-      - set_current_directory
-    steps:
-    - name: Update version in setup.py
-      run: |
-        cd ${{ needs.set_current_directory.outputs.current_directory }}
-        sed -i "s/version='${{ needs.read_version.outputs.version }}'/version='${{ needs.increment_version.outputs.new_version }}'/" setup.py
-
-  build_package:
-    runs-on: ubuntu-latest
-    needs: 
-      - update_version
-      - set_current_directory
-    steps:
-    - name: Build distribution package
-      run: |
-        cd ${{ needs.set_current_directory.outputs.current_directory }}
-        python setup.py sdist
-        python setup.py bdist_wheel
-
-  publish_to_pypi:
-    runs-on: ubuntu-latest
-    needs: 
-      - build_package
-      - update_version
-      - set_current_directory
-    steps:
-    - name: Publish to PyPI
-      run: |
-        cd ${{ needs.set_current_directory.outputs.current_directory }}
-        twine upload dist/*
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+  # Rest of the workflow...
