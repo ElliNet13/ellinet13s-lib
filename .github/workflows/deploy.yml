@@ -35,7 +35,7 @@ jobs:
       id: version
     steps:
     - name: Read current version
-      run: echo "::set-output name=version::$(awk -F"'" '/version=/{print $2}' setup.py)"
+      run: echo "::set-output name=version::$(awk -F"'" '/version=/{print $2}' ./setup.py)"
 
   increment_version:
     runs-on: ubuntu-latest
@@ -45,7 +45,7 @@ jobs:
     steps:
     - name: Increment version
       run: |
-        current_version=$(awk -F"'" '/version=/{print $2}' setup.py)
+        current_version=$(awk -F"'" '/version=/{print $2}' ./setup.py)
         if [[ "$current_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
           new_version=$(python -c "version = list(map(int, '$current_version'.split('.'))); version[-1] += 1; print('.'.join(map(str, version)))")
           echo "::set-output name=new_version::$new_version"
@@ -59,7 +59,7 @@ jobs:
     needs: increment_version
     steps:
     - name: Update version in setup.py
-      run: sed -i "s/version='${{ needs.read_version.outputs.version }}'/version='${{ needs.increment_version.outputs.new_version }}'/" setup.py
+      run: sed -i "s/version='${{ needs.read_version.outputs.version }}'/version='${{ needs.increment_version.outputs.new_version }}'/" ./setup.py
 
   build_package:
     runs-on: ubuntu-latest
