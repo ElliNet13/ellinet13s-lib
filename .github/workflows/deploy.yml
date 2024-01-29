@@ -1,4 +1,4 @@
-name: Deploy library
+namw: Python Library Deployment Workflow
 
 on:
   push:
@@ -39,7 +39,7 @@ jobs:
       id: version
     steps:
     - name: Read current version
-      run: echo "::set-output name=version::$(awk -F"'" '/version=/{print $2}' ./setup.py)"
+      run: echo "::set-output name=version::$(awk -F"'" '/version=/{print $2}' setup.py)"
 
   # Increment the project version
   increment_version:
@@ -50,7 +50,7 @@ jobs:
     steps:
     - name: Increment version
       run: |
-        current_version=$(awk -F"'" '/version=/{print $2}' ./setup.py)
+        current_version=$(awk -F"'" '/version=/{print $2}' setup.py)
         # Check if the current version follows a semantic versioning pattern
         if [[ "$current_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
           # Increment the last version component (patch version)
@@ -67,7 +67,7 @@ jobs:
     needs: increment_version
     steps:
     - name: Update version in setup.py
-      run: sed -i "s/version='${{ needs.read_version.outputs.version }}'/version='${{ needs.increment_version.outputs.new_version }}'/" ./setup.py
+      run: sed -i "s/version='${{ needs.read_version.outputs.version }}'/version='${{ needs.increment_version.outputs.new_version }}'/" setup.py
 
   # Build distribution package
   build_package:
