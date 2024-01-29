@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='ellinet13s-lib',
-    version='2.0.0',
+    version='2.0.1',
     author='ElliNet13',
     author_email='ellinet13@googlegroups.com',
     description='A library made by ElliNet13',
