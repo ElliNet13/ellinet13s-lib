@@ -25,6 +25,21 @@ jobs:
       run: |
         python setup.py sdist
         python setup.py bdist_wheel
+
+    - name: Check commit message
+      run: |
+        if git log -1 --pretty=%B | grep -q "Bump version to"; then
+          echo "Commit made by workflow. Skipping further steps."
+          exit 0
+        fi
+
+    - name: Commit version changes
+      run: |
+        git config --local user.email "actions@github.com"
+        git config --local user.name "GitHub Actions"
+        git add version.txt  # replace with your version file
+        git commit -m "Bump version to ${{ steps.build.outputs.new_version }}"
+
     - name: Publish to PyPI
       run: twine upload dist/*
       env:
