@@ -11,8 +11,14 @@ jobs:
     outputs:
       id: current_directory
     steps:
-    - name: Set current directory
-      run: echo "::set-output name=current_directory::$(pwd)/workflowStuff"
+    - name: Check setup.py existence
+      run: |
+        if [ -f "workflowStuff/setup.py" ]; then
+          echo "::set-output name=current_directory::$(pwd)/workflowStuff"
+        else
+          echo "Error: setup.py not found in workflowStuff directory."
+          exit 1
+        fi
 
   checkout:
     runs-on: ubuntu-latest
