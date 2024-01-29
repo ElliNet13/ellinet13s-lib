@@ -12,7 +12,7 @@ jobs:
       id: current_directory
     steps:
     - name: Set current directory
-      run: echo "::set-output name=current_directory::$(pwd)"
+      run: echo "::set-output name=current_directory::$(pwd) + /workflowStuff"
 
   checkout:
     runs-on: ubuntu-latest
