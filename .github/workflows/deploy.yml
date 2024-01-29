@@ -46,8 +46,13 @@ jobs:
     - name: Increment version
       run: |
         current_version=${{ needs.read_version.outputs.version }}
-        new_version=$(python -c "version = list(map(int, '$current_version'.split('.'))); version[-1] += 1; print('.'.join(map(str, version)))")
-        echo "::set-output name=new_version::$new_version"
+        if [ -n "$current_version" ]; then
+          new_version=$(python -c "version = list(map(int, '$current_version'.split('.'))); version[-1] += 1; print('.'.join(map(str, version)))")
+          echo "::set-output name=new_version::$new_version"
+        else
+          echo "Error: Current version is empty."
+          exit 1
+        fi
 
   update_version:
     runs-on: ubuntu-latest
@@ -67,7 +72,9 @@ jobs:
 
   publish_to_pypi:
     runs-on: ubuntu-latest
-    needs: build_package
+    needs: 
+      - build_package
+      - update_version
     steps:
     - name: Publish to PyPI
       run: twine upload dist/*
