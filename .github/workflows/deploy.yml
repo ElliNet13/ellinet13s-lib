@@ -19,7 +19,7 @@ jobs:
         python-version: 3.9
 
     - name: Install dependencies
-      run: pip install wheel
+      run: pip install wheel twine
 
     - name: Build distribution package
       run: |
