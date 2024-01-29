@@ -28,8 +28,8 @@ jobs:
     - name: Increment version
       id: new_version
       run: |
-        current_version=${{ steps.version.outputs.version }}
-        new_version=$(awk -F. -v OFS=. "{\$NF++} 1" <<< "$current_version")
+        current_version=$(grep -oP '(?<=version=\")[^\"]*' setup.py)
+        new_version=$(python -c "version = list(map(int, '$current_version'.split('.'))); version[-1] += 1; print('.'.join(map(str, version)))")
         echo "::set-output name=new_version::$new_version"
 
     - name: Update version in setup.py
