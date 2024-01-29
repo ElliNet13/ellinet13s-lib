@@ -1,3 +1,5 @@
+from setuptools import setup
+
 # Read the current version from the file
 with open('version.txt', 'r') as file:
     current_version = file.read().strip()
@@ -24,6 +26,7 @@ new_version = f"{major}.{minor}.{patch}"
 with open('version.txt', 'w') as file:
     file.write(new_version)
 
+# Use the setup function for your package configuration
 setup(
     name='ellinet13s-lib',
     version=new_version,
