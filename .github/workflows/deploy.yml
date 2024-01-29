@@ -27,7 +27,10 @@ jobs:
 
     - name: Increment version
       id: new_version
-      run: echo "::set-output name=new_version::${{ steps.version.outputs.version & awk -F. -v OFS=. '{$NF++;print}' }}"
+      run: |
+        current_version=${{ steps.version.outputs.version }}
+        new_version=$(awk -F. -v OFS=. "{\$NF++} 1" <<< "$current_version")
+        echo "::set-output name=new_version::$new_version"
 
     - name: Update version in setup.py
       run: sed -i "s/version='${{ steps.version.outputs.version }}'/version='${{ steps.new_version.outputs.new_version }}'/" setup.py
