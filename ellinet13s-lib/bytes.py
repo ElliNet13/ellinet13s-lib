@@ -54,7 +54,7 @@ class Bytes:
 
     @staticmethod
     def binary_to_byte(binary_string):
-        return bytes(int(binary_string[i:i + 8], 2) for i in range(0, len(binary_string), 8)
+        return bytes(int(binary_string[i:i + 8], 2) for i in range(0, len(binary_string), 8))
 
     @staticmethod
     def byte_to_utf16le(byte_data):
@@ -70,15 +70,15 @@ class Bytes:
 
     @staticmethod
     def byte_xor(byte_data1, byte_data2):
-        return bytes(b1 ^ b2 for b1, b2 in zip(byte_data1, byte_data2)
+        return bytes(b1 ^ b2 for b1, b2 in zip(byte_data1, byte_data2))
 
     @staticmethod
     def byte_and(byte_data1, byte_data2):
-        return bytes(b1 & b2 for b1, b2 in zip(byte_data1, byte_data2)
+        return bytes(b1 & b2 for b1, b2 in zip(byte_data1, byte_data2))
 
     @staticmethod
     def byte_or(byte_data1, byte_data2):
-        return bytes(b1 | b2 for b1, b2 in zip(byte_data1, byte_data2)
+        return bytes(b1 | b2 for b1, b2 in zip(byte_data1, byte_data2))
 
     @staticmethod
     def byte_not(byte_data):
@@ -108,7 +108,7 @@ class Bytes:
 
     @staticmethod
     def byte_mean(byte_data1, byte_data2):
-        return bytes((b1 + b2) // 2 for b1, b2 in zip(byte_data1, byte_data2)
+        return bytes((b1 + b2) // 2 for b1, b2 in zip(byte_data1, byte_data2))
 
     @staticmethod
     def sum_of_bytes(byte_data):
@@ -133,11 +133,11 @@ class Bytes:
 
     @staticmethod
     def bytes_to_ipv4(byte_data):
-        return ".".join(map(str, byte_data)
+        return ".".join(map(str, byte_data))
 
     @staticmethod
     def ipv4_to_bytes(ipv4_string):
-        return bytes(map(int, ipv4_string.split("."))
+        return bytes(map(int, ipv4_string.split(".")))
 
     @staticmethod
     def xor_encrypt(byte_data, key):
